@@ -8,7 +8,7 @@ import {
   OneToMany,
 } from 'typeorm';
 
-@Entity()
+@Entity('posts')
 export class Post {
   @PrimaryGeneratedColumn()
   id: number;

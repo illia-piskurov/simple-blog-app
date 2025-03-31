@@ -17,11 +17,10 @@ export class CommentsController {
 
   @Post()
   create(
-    @Body() postId: number,
-    userId: number,
+    @Body()
     createCommentDto: CreateCommentDto,
   ) {
-    return this.commentsService.addComment(postId, userId, createCommentDto);
+    return this.commentsService.addComment(createCommentDto);
   }
 
   @Get(':id')
