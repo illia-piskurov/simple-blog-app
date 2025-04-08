@@ -116,7 +116,12 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.gradient-bg {
+  background: linear-gradient(to bottom, #f1f5f9, #e2e8f0, #cbd5e1);
 }
