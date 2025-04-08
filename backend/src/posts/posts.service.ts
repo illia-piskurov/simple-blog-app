@@ -22,7 +22,7 @@ export class PostsService {
 
     if (!user) {
       throw new NotFoundException(
-        `User with ID ${createPostDto.userId} not found.`,
+        `User with id "${createPostDto.userId}" not found.`,
       );
     }
 
@@ -34,21 +34,25 @@ export class PostsService {
     return this.postsRepository.save(post);
   }
 
-  findAll(): Promise<Post[]> {
+  async findAll(): Promise<Post[]> {
     return this.postsRepository.find();
   }
 
-  findOne(id: number) {
+  async findOne(id: number): Promise<Post | null> {
     return this.postsRepository.findOne({
       where: { id },
     });
   }
 
-  update(id: number, updatePostDto: UpdatePostDto): Promise<Post> {
+  async update(id: number, updatePostDto: UpdatePostDto): Promise<Post> {
     return this.postsRepository.save({ ...updatePostDto, id });
   }
 
-  remove(id: number) {
-    return this.postsRepository.delete(id);
+  async remove(id: number) {
+    const result = await this.postsRepository.delete(id);
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`Post with id "${id}" not found.`);
+    }
   }
 }

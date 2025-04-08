@@ -15,7 +15,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-  ) {}
+  ) { }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { email, username } = createUserDto;
@@ -24,13 +24,13 @@ export class UsersService {
       where: { email },
     });
     if (existedEmail) {
-      throw new ForbiddenException('Email already existed.');
+      throw new ForbiddenException(`Email "${email}" already existed.`);
     }
     const existedUsername = await this.usersRepository.findOne({
       where: { username },
     });
     if (existedUsername) {
-      throw new ForbiddenException('Username already existed.');
+      throw new ForbiddenException(`Username "${username}" already existed.`);
     }
 
     if (createUserDto.password != createUserDto.confirmPassword) {
@@ -40,7 +40,7 @@ export class UsersService {
     }
 
     const user = this.usersRepository.create(createUserDto);
-    return await this.usersRepository.save(user);
+    return this.usersRepository.save(user);
   }
 
   async findAll(): Promise<User[]> {
@@ -55,19 +55,17 @@ export class UsersService {
     const foundUser = await this.usersRepository.findOne({ where: { id } });
 
     if (!foundUser) {
-      throw new NotFoundException('User not found.');
+      throw new NotFoundException(`User with id "${id}" not found.`);
     }
 
     return this.usersRepository.save({ ...updateUserDto, id });
   }
 
-  async remove(id: number): Promise<boolean> {
-    const foundUser = await this.usersRepository.findOne({ where: { id } });
+  async remove(id: number): Promise<void> {
+    const result = await this.usersRepository.delete(id);
 
-    if (!foundUser) {
-      throw new NotFoundException('User not found.');
+    if (result.affected === 0) {
+      throw new NotFoundException(`User with id "${id}" not found.`);
     }
-
-    return (await this.usersRepository.delete(id)) ? true : false;
   }
 }

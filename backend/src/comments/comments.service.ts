@@ -62,14 +62,10 @@ export class CommentsService {
   }
 
   async remove(id: number) {
-    const foundComment = await this.commentsRepository.findOne({
-      where: { id },
-    });
+    const result = await this.commentsRepository.delete(id);
 
-    if (!foundComment) {
-      throw new NotFoundException('Comment not found.');
+    if (result.affected === 0) {
+      throw new NotFoundException(`Comment with id "${id}" not found.`);
     }
-
-    return this.usersRepository.delete(id);
   }
 }
