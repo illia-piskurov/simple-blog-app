@@ -33,12 +33,6 @@ export class UsersService {
       throw new ForbiddenException(`Username "${username}" already existed.`);
     }
 
-    if (createUserDto.password != createUserDto.confirmPassword) {
-      throw new BadRequestException(
-        'Password and confirm password do not match.',
-      );
-    }
-
     const user = this.usersRepository.create(createUserDto);
     return this.usersRepository.save(user);
   }
@@ -49,6 +43,10 @@ export class UsersService {
 
   async findOne(id: number): Promise<User | null> {
     return this.usersRepository.findOne({ where: { id } });
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    return this.usersRepository.findOne({ where: { email } });
   }
 
   async updateProfile(id: number, updateUserDto: UpdateUserDto): Promise<User> {
