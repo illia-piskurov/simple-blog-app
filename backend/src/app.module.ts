@@ -27,4 +27,4 @@ import { getTypeOrmConfig } from './config/typeorm.config';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
@@ -11,7 +15,7 @@ import { isDev } from 'src/utils/is-dev.util';
 @Injectable()
 export class AuthService {
   private readonly JWT_SECRET: string;
-  private readonly JWT_ACCESS_TOKEN_TTL: string
+  private readonly JWT_ACCESS_TOKEN_TTL: string;
   private readonly JWT_REFRESH_TOKEN_TTL: string;
 
   private readonly COOKIE_DOMAIN: string;
@@ -23,14 +27,12 @@ export class AuthService {
   ) {
     this.JWT_SECRET = configService.getOrThrow<string>('JWT_SECRET');
     this.JWT_ACCESS_TOKEN_TTL = configService.getOrThrow<string>(
-      'JWT_ACCESS_TOKEN_TTL'
+      'JWT_ACCESS_TOKEN_TTL',
     );
     this.JWT_REFRESH_TOKEN_TTL = configService.getOrThrow<string>(
-      'JWT_REFRESH_TOKEN_TTL'
+      'JWT_REFRESH_TOKEN_TTL',
     );
-    this.COOKIE_DOMAIN = configService.getOrThrow<string>(
-      'COOKIE_DOMAIN'
-    );
+    this.COOKIE_DOMAIN = configService.getOrThrow<string>('COOKIE_DOMAIN');
   }
 
   async register(res: Response, dto: RegisterRequest) {
@@ -60,7 +62,7 @@ export class AuthService {
     const refreshToken = req.cookies['refreshToken'];
 
     if (!refreshToken) {
-      throw new UnauthorizedException('Invalid refresh token.')
+      throw new UnauthorizedException('Invalid refresh token.');
     }
 
     const payload: JwtPayload = await this.jwtService.verifyAsync(refreshToken);
@@ -97,7 +99,7 @@ export class AuthService {
     this.setCookie(
       res,
       refreshToken,
-      new Date(Date.now() + 1000 + 60 * 60 * 24 * 7)
+      new Date(Date.now() + 1000 + 60 * 60 * 24 * 7),
     ); //TODO: util for this
 
     return { accessToken };
@@ -107,17 +109,17 @@ export class AuthService {
     const payload: JwtPayload = { id };
 
     const accessToken = this.jwtService.sign(payload, {
-      expiresIn: this.JWT_ACCESS_TOKEN_TTL
+      expiresIn: this.JWT_ACCESS_TOKEN_TTL,
     });
 
     const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: this.JWT_REFRESH_TOKEN_TTL
+      expiresIn: this.JWT_REFRESH_TOKEN_TTL,
     });
 
     return {
       accessToken,
       refreshToken,
-    }
+    };
   }
 
   private setCookie(res: Response, value: string, expires: Date) {
@@ -127,6 +129,6 @@ export class AuthService {
       expires,
       secure: !isDev(this.configService),
       sameSite: isDev(this.configService) ? 'none' : 'lax',
-    })
+    });
   }
 }

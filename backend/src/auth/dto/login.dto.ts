@@ -1,4 +1,11 @@
-import { IsString, IsNotEmpty, IsEmail, MaxLength, MinLength, Max } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsEmail,
+  MaxLength,
+  MinLength,
+  Max,
+} from 'class-validator';
 
 export class LoginRequest {
   @IsString()
@@ -8,7 +15,7 @@ export class LoginRequest {
 
   @IsString()
   @IsNotEmpty()
-  @MinLength(6, { message: "Password must exceed 50 characters." })
-  @MaxLength(30, { message: "Password must not exceed 30 characters." })
+  @MinLength(6, { message: 'Password must exceed 50 characters.' })
+  @MaxLength(30, { message: 'Password must not exceed 30 characters.' })
   password: string;
 }

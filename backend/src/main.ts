@@ -14,13 +14,11 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
 
-  app.enableCors(
-    {
-      origin: config.getOrThrow<string>('ALLOWRD_ORIGINS'),
-      methods: '*',
-      credentials: true,
-    }
-  );
+  app.enableCors({
+    origin: config.getOrThrow<string>('ALLOWRD_ORIGINS'),
+    methods: '*',
+    credentials: true,
+  });
   setupSwagger(app);
   await app.listen(process.env.PORT ?? 3000);
 }
