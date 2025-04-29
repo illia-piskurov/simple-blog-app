@@ -27,16 +27,16 @@ export class UsersController {
 
   @Get(':id')
   async getProfile(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+    return this.usersService.findOne(id);
   }
 
   @Patch('profile/:id')
   updateProfile(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.updateProfile(+id, updateUserDto);
+    return this.usersService.updateProfile(id, updateUserDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+    return this.usersService.remove(id);
   }
 }

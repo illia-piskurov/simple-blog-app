@@ -66,7 +66,7 @@ export class AuthService {
     const payload: JwtPayload = await this.jwtService.verifyAsync(refreshToken);
 
     if (payload) {
-      const user = await this.usersService.findOne(Number(payload.id));
+      const user = await this.usersService.findOne(payload.id);
 
       if (!user) {
         throw new NotFoundException('User not found.');
@@ -76,9 +76,35 @@ export class AuthService {
     }
   }
 
-  private generateTokens(id: number) {
-    const idStr = String(id);
-    const payload: JwtPayload = { id: idStr };
+  async logout(res: Response) {
+    this.setCookie(res, 'refreshToken', new Date(0));
+    return true;
+  }
+
+  async validate(id: string) {
+    const user = this.usersService.findOne(id);
+
+    if (!user) {
+      throw new NotFoundException('User not found.');
+    }
+
+    return user;
+  }
+
+  private auth(res: Response, id: string) {
+    const { accessToken, refreshToken } = this.generateTokens(id);
+
+    this.setCookie(
+      res,
+      refreshToken,
+      new Date(Date.now() + 1000 + 60 * 60 * 24 * 7)
+    ); //TODO: util for this
+
+    return { accessToken };
+  }
+
+  private generateTokens(id: string) {
+    const payload: JwtPayload = { id };
 
     const accessToken = this.jwtService.sign(payload, {
       expiresIn: this.JWT_ACCESS_TOKEN_TTL
@@ -102,22 +128,5 @@ export class AuthService {
       secure: !isDev(this.configService),
       sameSite: isDev(this.configService) ? 'none' : 'lax',
     })
-  }
-
-  async logout(res: Response) {
-    this.setCookie(res, 'refreshToken', new Date(0));
-    return true;
-  }
-
-  private auth(res: Response, id: number) {
-    const { accessToken, refreshToken } = this.generateTokens(id);
-
-    this.setCookie(
-      res,
-      refreshToken,
-      new Date(Date.now() + 1000 + 60 * 60 * 24 * 7)
-    ); //TODO: util for this
-
-    return { accessToken };
   }
 }

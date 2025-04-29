@@ -38,17 +38,17 @@ export class PostsService {
     return this.postsRepository.find();
   }
 
-  async findOne(id: number): Promise<Post | null> {
+  async findOne(id: string): Promise<Post | null> {
     return this.postsRepository.findOne({
       where: { id },
     });
   }
 
-  async update(id: number, updatePostDto: UpdatePostDto): Promise<Post> {
+  async update(id: string, updatePostDto: UpdatePostDto): Promise<Post> {
     return this.postsRepository.save({ ...updatePostDto, id });
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const result = await this.postsRepository.delete(id);
 
     if (result.affected === 0) {

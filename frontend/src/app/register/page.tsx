@@ -50,11 +50,21 @@ export default function RegisterPage() {
         password: formData.password
       });
 
-      // // После регистрации сразу логинимся, чтобы установить куку
       // await axios.post("http://127.0.0.1:3000/auth/login", {
       //   email: formData.email,
       //   password: formData.password
-      // }, { withCredentials: true });
+      // });
+
+      const loginResponse = await axios.post("http://127.0.0.1:3000/auth/login", {
+        email: formData.email,
+        password: formData.password
+      });
+
+      // Сохраняем токен в куки или localStorage
+      console.log(loginResponse);
+      if (loginResponse.data?.token) {
+        document.cookie = `token=${loginResponse.data.token}; path=/`; // Сохраняем токен
+      }
 
       setSuccessMessage("You have been successfully registered.");
       setIsRegistered(true);

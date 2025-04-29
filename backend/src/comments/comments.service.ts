@@ -40,7 +40,7 @@ export class CommentsService {
     return comment;
   }
 
-  async findAllOfOnePost(postId: number): Promise<PostComment[]> {
+  async findAllOfOnePost(postId: string): Promise<PostComment[]> {
     const foundComments = await this.commentsRepository.find({
       where: { post: { id: postId } },
       relations: ['user'],
@@ -49,7 +49,7 @@ export class CommentsService {
     return foundComments;
   }
 
-  async update(id: number, updateCommentDto: UpdateCommentDto) {
+  async update(id: string, updateCommentDto: UpdateCommentDto) {
     const foundComment = await this.commentsRepository.findOne({
       where: { id },
     });
@@ -61,7 +61,7 @@ export class CommentsService {
     return this.usersRepository.save({ ...updateCommentDto, id });
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const result = await this.commentsRepository.delete(id);
 
     if (result.affected === 0) {
