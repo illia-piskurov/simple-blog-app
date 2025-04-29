@@ -12,6 +12,7 @@ export class RegisterRequest {
   @ApiProperty({
     description: 'The username of the user',
     example: 'John Doe',
+    maxLength: 50,
   })
   @IsString()
   @IsNotEmpty()
@@ -30,6 +31,8 @@ export class RegisterRequest {
   @ApiProperty({
     example: 'password123',
     description: 'The password of the user',
+    maxLength: 30,
+    minLength: 6,
   })
   @IsString()
   @IsNotEmpty()

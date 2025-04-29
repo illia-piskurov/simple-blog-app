@@ -14,6 +14,7 @@ import { LoginRequest } from './dto/login.dto';
 import type { Request, Response } from 'express';
 import {
   ApiBadRequestResponse,
+  ApiBody,
   ApiConflictResponse,
   ApiOkResponse,
   ApiOperation,
@@ -33,6 +34,7 @@ export class AuthController {
   @ApiOkResponse({ type: AuthResponse })
   @ApiConflictResponse({ description: 'A user with this mail already exists.' })
   @ApiBadRequestResponse({ description: 'Invalid entry data.' })
+  @ApiBody({ type: RegisterRequest })
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   async register(
@@ -42,6 +44,10 @@ export class AuthController {
     return await this.authService.register(res, dto);
   }
 
+  @ApiOperation({ summary: 'Login' })
+  @ApiOkResponse({ type: AuthResponse })
+  @ApiBadRequestResponse({ description: 'Invalid entry data.' })
+  @ApiBody({ type: LoginRequest })
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(
@@ -51,6 +57,7 @@ export class AuthController {
     return await this.authService.login(res, dto);
   }
 
+  @ApiOperation({ summary: 'Refresh JWT' })
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   async refresh(
@@ -60,6 +67,7 @@ export class AuthController {
     return await this.authService.refresh(req, res);
   }
 
+  @ApiOperation({ summary: 'Logout' })
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   async logout(@Res({ passthrough: true }) res: Response) {
@@ -67,6 +75,7 @@ export class AuthController {
   }
 
   @Authorization()
+  @ApiOperation({ summary: 'Get information about me' })
   @Get('@me')
   @HttpCode(HttpStatus.OK)
   async me(@Authorized() user: User) {

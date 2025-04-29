@@ -8,7 +8,7 @@ export class PostComment {
   id: string;
 
   @Column()
-  nameOfComment: string;
+  title: string;
 
   @Column()
   message: string;

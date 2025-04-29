@@ -1,18 +1,28 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsString,
   IsNotEmpty,
   IsEmail,
   MaxLength,
   MinLength,
-  Max,
 } from 'class-validator';
 
 export class LoginRequest {
+  @ApiProperty({
+    description: 'User email',
+    example: 'user@example.com',
+  })
   @IsString()
   @IsNotEmpty()
   @IsEmail()
   email: string;
 
+  @ApiProperty({
+    description: 'User password',
+    example: 'password123',
+    maxLength: 30,
+    minLength: 6,
+  })
   @IsString()
   @IsNotEmpty()
   @MinLength(6, { message: 'Password must exceed 50 characters.' })
