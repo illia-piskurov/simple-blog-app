@@ -1,6 +1,5 @@
 import {
-  BadRequestException,
-  ForbiddenException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -15,7 +14,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-  ) { }
+  ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { email, username } = createUserDto;
@@ -24,19 +23,13 @@ export class UsersService {
       where: { email },
     });
     if (existedEmail) {
-      throw new ForbiddenException(`Email "${email}" already existed.`);
+      throw new ConflictException(`Email "${email}" already existed.`);
     }
     const existedUsername = await this.usersRepository.findOne({
       where: { username },
     });
     if (existedUsername) {
-      throw new ForbiddenException(`Username "${username}" already existed.`);
-    }
-
-    if (createUserDto.password != createUserDto.confirmPassword) {
-      throw new BadRequestException(
-        'Password and confirm password do not match.',
-      );
+      throw new ConflictException(`Username "${username}" already existed.`);
     }
 
     const user = this.usersRepository.create(createUserDto);
@@ -47,11 +40,15 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  async findOne(id: number): Promise<User | null> {
+  async findOne(id: string): Promise<User | null> {
     return this.usersRepository.findOne({ where: { id } });
   }
 
-  async updateProfile(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+  async findByEmail(email: string): Promise<User | null> {
+    return this.usersRepository.findOne({ where: { email } });
+  }
+
+  async updateProfile(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const foundUser = await this.usersRepository.findOne({ where: { id } });
 
     if (!foundUser) {
@@ -61,7 +58,7 @@ export class UsersService {
     return this.usersRepository.save({ ...updateUserDto, id });
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     const result = await this.usersRepository.delete(id);
 
     if (result.affected === 0) {

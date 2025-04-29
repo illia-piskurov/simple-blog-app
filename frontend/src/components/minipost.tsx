@@ -18,7 +18,6 @@ const MiniPost = ({ id, title, description, body }: MiniPostProps) => {
         </CardHeader>
         <CardContent>
           <p className="text-gray-600">{body}</p>
-          <img src="https://w.wallhaven.cc/full/m3/wallhaven-m38jq9.jpg" className="mx-auto rounded-xl mt-6"></img>
         </CardContent>
       </Card>
     </Link>

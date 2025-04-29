@@ -4,11 +4,11 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('comments')
 export class PostComment {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
-  nameOfComment: string;
+  title: string;
 
   @Column()
   message: string;

@@ -3,23 +3,26 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PostsModule } from './posts/posts.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Post } from './posts/entities/post.entity';
 import { UsersModule } from './users/users.module';
-import { User } from './users/entities/user.entity';
 import { CommentsModule } from './comments/comments.module';
-import { PostComment } from './comments/entities/comment.entity';
+import { AuthModule } from './auth/auth.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { getTypeOrmConfig } from './config/typeorm.config';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: 'posts.db',
-      entities: [Post, User, PostComment],
-      synchronize: true,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: getTypeOrmConfig,
+      inject: [ConfigService],
     }),
     PostsModule,
     UsersModule,
     CommentsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

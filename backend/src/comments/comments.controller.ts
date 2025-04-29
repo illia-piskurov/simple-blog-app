@@ -25,16 +25,16 @@ export class CommentsController {
 
   @Get(':id')
   findAllOfOnePost(@Param('id') id: string) {
-    return this.commentsService.findAllOfOnePost(+id);
+    return this.commentsService.findAllOfOnePost(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
-    return this.commentsService.update(+id, updateCommentDto);
+    return this.commentsService.update(id, updateCommentDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.commentsService.remove(+id);
+    return this.commentsService.remove(id);
   }
 }
