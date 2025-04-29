@@ -1,25 +1,39 @@
-import { Controller, Post, Body, Res } from '@nestjs/common';
-import { Response } from 'express';
+import { Body, Controller, HttpCode, HttpStatus, Post, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { RegisterRequest } from './dto/register.dto';
+import { LoginRequest } from './dto/login.dto';
+import type { Request, Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
+  @Post('register')
+  @HttpCode(HttpStatus.CREATED)
+  async register(@Res({ passthrough: true }) res: Response, @Body() dto: RegisterRequest) {
+    return await this.authService.register(res, dto);
+  }
+
   @Post('login')
-  async login(
-    @Body() loginDto: { email: string; password: string },
+  @HttpCode(HttpStatus.OK)
+  async login(@Res({ passthrough: true }) res: Response, @Body() dto: LoginRequest) {
+    return await this.authService.login(res, dto);
+  }
+
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  async refresh(
+    @Req() req: Request,
     @Res({ passthrough: true }) res: Response
   ) {
-    const { access_token, user } = await this.authService.login(loginDto);
+    return await this.authService.refresh(req, res);
+  }
 
-    res.cookie('token', access_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // только через HTTPS в продакшене
-      sameSite: 'lax',
-      maxAge: 1000 * 60 * 60, // 1 час
-    });
-
-    return { user }; // можно вернуть например профиль пользователя без пароля
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  async logout(
+    @Res({ passthrough: true }) res: Response
+  ) {
+    return await this.authService.logout(res);
   }
 }

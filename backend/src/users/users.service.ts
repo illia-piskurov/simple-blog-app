@@ -1,6 +1,5 @@
 import {
-  BadRequestException,
-  ForbiddenException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -24,13 +23,13 @@ export class UsersService {
       where: { email },
     });
     if (existedEmail) {
-      throw new ForbiddenException(`Email "${email}" already existed.`);
+      throw new ConflictException(`Email "${email}" already existed.`);
     }
     const existedUsername = await this.usersRepository.findOne({
       where: { username },
     });
     if (existedUsername) {
-      throw new ForbiddenException(`Username "${username}" already existed.`);
+      throw new ConflictException(`Username "${username}" already existed.`);
     }
 
     const user = this.usersRepository.create(createUserDto);
