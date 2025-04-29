@@ -1,67 +1,88 @@
-// src/app/login/page.tsx
+'use client'
 
-"use client";
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
+import axios from 'axios'
 
-import * as React from "react";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";  // Импортируем компонент кнопки
-import { Input } from "@/components/ui/input";    // Импортируем компонент поля ввода
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"; // Импортируем компоненты из shadcn/ui
+const formSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+})
 
 export default function LoginPage() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const router = useRouter()
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Logging in:", { username, password });
-  };
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  })
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      const response = await axios.post('http://localhost:3000/auth/login', values, {
+        withCredentials: true,
+      })
+
+      const { accessToken } = response.data
+
+      localStorage.setItem('accessToken', accessToken)
+
+      toast.success('Login successful!')
+      router.push('/')
+    } catch (err: any) {
+      const message = err?.response?.data?.message ?? 'Login failed'
+      toast.error(typeof message === 'string' ? message : message.join(', '))
+    }
+  }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
-      {/* Используем Card для отображения содержимого формы */}
-      <Card className="w-96">
-        <CardHeader>
-          <CardTitle className="text-center text-2xl font-bold">Login</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Username Field */}
-            <div>
-              <Input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username"
-                className="w-full px-3 py-2 border rounded-md focus:ring focus:ring-blue-300"
-                required
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardContent className="space-y-4 pt-6">
+          <h1 className="text-2xl font-bold text-center">Login</h1>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="you@example.com" type="email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-
-            {/* Password Field */}
-            <div>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                className="w-full px-3 py-2 border rounded-md focus:ring focus:ring-blue-300"
-                required
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input placeholder="********" type="password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-
-            {/* Submit Button */}
-            <Button
-              type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
-            >
-              Log In
-            </Button>
-          </form>
+              <Button type="submit" className="w-full">Login</Button>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

@@ -1,196 +1,129 @@
-"use client";
+'use client'
 
-import * as React from "react";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
+import axios from 'axios'
+
+
+const formSchema = z
+  .object({
+    name: z.string().min(2, 'Name must be at least 2 characters'),
+    email: z.string().email('Invalid email address'),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  })
 
 export default function RegisterPage() {
-  const router = useRouter();
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+  const router = useRouter()
 
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [loading, setLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [isRegistered, setIsRegistered] = useState(false);
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+  })
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const newErrors: { [key: string]: string } = {};
-
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "The password and its confirm are not the same";
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    const payload = {
+      username: values.name,
+      password: values.password,
+      email: values.email,
     }
 
     try {
-      setLoading(true);
-      setSuccessMessage(null);
+      const response = await axios.post('http://localhost:3000/auth/register', payload, {
+        withCredentials: true,
+      })
 
-      const response = await axios.post("http://127.0.0.1:3000/users/register", {
-        username: formData.username,
-        email: formData.email,
-        password: formData.password
-      });
+      const { accessToken } = response.data;
+      localStorage.setItem('accessToken', accessToken);
 
-      // await axios.post("http://127.0.0.1:3000/auth/login", {
-      //   email: formData.email,
-      //   password: formData.password
-      // });
-
-      const loginResponse = await axios.post("http://127.0.0.1:3000/auth/login", {
-        email: formData.email,
-        password: formData.password
-      });
-
-      // Сохраняем токен в куки или localStorage
-      console.log(loginResponse);
-      if (loginResponse.data?.token) {
-        document.cookie = `token=${loginResponse.data.token}; path=/`; // Сохраняем токен
-      }
-
-      setSuccessMessage("You have been successfully registered.");
-      setIsRegistered(true);
-
-      setFormData({
-        username: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-      });
-      setErrors({});
-    } catch (error: any) {
-      if (error.response?.data) {
-        setErrors({ form: error.response.data.message || "Registration failed" });
-      } else {
-        setErrors({ form: "An unexpected error occurred." });
-      }
-    } finally {
-      setLoading(false);
+      toast.success('Registration successful!')
+      router.push('/')
+    } catch (err: any) {
+      const message = err?.response?.data?.message ?? 'Registration failed'
+      toast.error(typeof message === 'string' ? message : message.join(', '))
     }
-  };
-
-  if (isRegistered) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-100">
-        <Card className="w-96">
-          <CardHeader>
-            <CardTitle className="text-center text-2xl font-bold">Registration Successful</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center space-y-4">
-              <p className="text-lg text-green-600">{successMessage}</p>
-              <Button
-                onClick={() => router.push("/")}
-                className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
-              >
-                Go Home
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
-      <Card className="w-96">
-        <CardHeader>
-          <CardTitle className="text-center text-2xl font-bold">Register</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {successMessage && (
-            <p className="text-green-500 text-center mb-4">{successMessage}</p>
-          )}
-          {errors.form && (
-            <p className="text-red-500 text-center mb-4">{errors.form}</p>
-          )}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Username Field */}
-            <div>
-              <Input
-                name="username"
-                type="text"
-                value={formData.username}
-                onChange={handleChange}
-                placeholder="Username"
-                className="w-full"
-                required
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardContent className="space-y-4 pt-6">
+          <h1 className="text-2xl font-bold text-center">Sign Up</h1>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Your name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {errors.username && <p className="text-red-500 text-sm">{errors.username}</p>}
-            </div>
-
-            {/* Email Field */}
-            <div>
-              <Input
+              <FormField
+                control={form.control}
                 name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Email"
-                className="w-full"
-                required
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="you@example.com" type="email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
-            </div>
-
-            {/* Password Field */}
-            <div>
-              <Input
+              <FormField
+                control={form.control}
                 name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Password"
-                className="w-full"
-                required
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input placeholder="********" type="password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
-            </div>
-
-            {/* Confirm Password Field */}
-            <div>
-              <Input
+              <FormField
+                control={form.control}
                 name="confirmPassword"
-                type="password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                placeholder="Confirm Password"
-                className="w-full"
-                required
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm Password</FormLabel>
+                    <FormControl>
+                      <Input placeholder="********" type="password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword}</p>}
-            </div>
-
-            {/* Submit Button */}
-            <Button
-              type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
-              disabled={loading}
-            >
-              {loading ? "Registering..." : "Register Now"}
-            </Button>
-          </form>
+              <Button type="submit" className="w-full">Create Account</Button>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

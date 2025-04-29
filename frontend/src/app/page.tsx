@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import AppBar from "@/components/appbar";
 import MiniPost from "@/components/minipost";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 interface Post {
   id: number;
@@ -19,11 +20,9 @@ export default function HomePage() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const router = useRouter();
 
-  // Загрузка данных с сервера
   useEffect(() => {
-    // Проверка на авторизацию
-    const token = document.cookie.split("; ").find(row => row.startsWith("token="));
-    if (token) {
+    const accessToken = localStorage.getItem('accessToken');
+    if (accessToken) {
       setIsAuthenticated(true);
     }
 
@@ -45,10 +44,13 @@ export default function HomePage() {
   }, []);
 
   const handleLogout = () => {
-    // Логика выхода из системы
-    document.cookie = "token=; Max-Age=0"; // Удаляем токен
-    setIsAuthenticated(false);
-    router.push("/"); // Перенаправляем на главную
+    axios.post('http://localhost:3000/auth/logout', {
+      withCredentials: true,
+    }).then(() => {
+      localStorage.removeItem('accessToken');
+      setIsAuthenticated(false);
+      router.push("/");
+    });
   };
 
   return (

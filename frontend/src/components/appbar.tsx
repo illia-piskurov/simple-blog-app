@@ -37,12 +37,12 @@ export default function AppBar() {
         {!isLoggedIn ? (
           <>
             <Link href="/login">
-              <Button className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-all">
+              <Button>
                 Log In
               </Button>
             </Link>
             <Link href="/register">
-              <Button className="bg-green-500 hover:bg-green-600 text-white">
+              <Button>
                 Register
               </Button>
             </Link>
