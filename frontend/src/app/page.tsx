@@ -1,32 +1,39 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import AppBar from "@/components/appbar";
+import { Header } from "@/components/Header";
 import MiniPost from "@/components/minipost";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+//import Post from "@/shared/types/post.interface";
+import { PostCard, type Post } from '@/components/PostCard'
 
-interface Post {
-  id: number;
-  title: string;
-  description: string;
-  body: string;
-}
+const examplePosts: Post[] = [
+  {
+    id: '1',
+    title: 'How to use NestJS with PostgreSQL',
+    description: 'In this article, we explore how to set up a NestJS project with a PostgreSQL database from scratch.',
+    author: { name: 'John Doe' },
+    commentsCount: 4,
+  },
+  {
+    id: '2',
+    title: 'Deploying Next.js with Vercel',
+    description: 'This guide will walk you through the process of deploying your Next.js app using Vercel\'s powerful platform.',
+    author: { name: 'Jane Smith' },
+    commentsCount: 2,
+  },
+]
+
 
 export default function HomePage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const router = useRouter();
 
   useEffect(() => {
-    const accessToken = localStorage.getItem('accessToken');
-    if (accessToken) {
-      setIsAuthenticated(true);
-    }
-
-    fetch("http://127.0.0.1:3000/posts")
+    fetch(`${process.env.SERVER_URL}/posts`)
       .then((res) => {
         if (!res.ok) {
           throw new Error("Failed to fetch posts");
@@ -43,44 +50,23 @@ export default function HomePage() {
       });
   }, []);
 
-  const handleLogout = () => {
-    axios.post('http://localhost:3000/auth/logout', {
-      withCredentials: true,
-    }).then(() => {
-      localStorage.removeItem('accessToken');
-      setIsAuthenticated(false);
-      router.push("/");
-    });
-  };
-
   return (
     <div className="min-h-screen flex flex-col gradient-bg">
-      <AppBar />
+      <Header />
 
-      <main className="flex-1 p-6">
-        <div className="flex justify-between mb-4">
-          {isAuthenticated ? (
-            <div>
-              <button onClick={() => router.push("/profile")}>Profile</button>
-              <button onClick={handleLogout}>Log out</button>
-            </div>
-          ) : (
-            <div>
-              <button onClick={() => router.push("/login")}>Login</button>
-              <button onClick={() => router.push("/register")}>Register</button>
-            </div>
-          )}
-        </div>
+      <main className="flex-1 p-6 pt-24">
+        <h2 className="text-2xl font-semibold mb-4">Recent Posts</h2>
 
-        {/* Загрузка и ошибки */}
         {loading && <p>Loading posts...</p>}
         {error && <p className="text-red-500">Error: {error}</p>}
 
-        {/* Отображение постов */}
         {posts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {posts.map((post) => (
+            {/* {posts.map((post) => (
               <MiniPost key={post.id} id={post.id} title={post.title} description={post.description} body={post.body} />
+            ))} */}
+            {examplePosts.map(post => (
+              <PostCard key={post.id} post={post} />
             ))}
           </div>
         ) : (
