@@ -90,8 +90,11 @@ export default function ProfilePage() {
         </div>
       ))}
 
-      <Button onClick={handleSubmit} className="mt-4">
+      <Button onClick={handleSubmit} className="mt-4 mr-4">
         Save Changes
+      </Button>
+      <Button onClick={() => router.push('/')} className="mt-4" variant='outline'>
+        Back
       </Button>
     </div>
   )
