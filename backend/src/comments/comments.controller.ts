@@ -10,17 +10,22 @@ import {
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { Authorization } from 'src/auth/decorators/authorization.decorator';
+import { Authorized } from 'src/auth/decorators/authorized.decorator';
 
 @Controller('comments')
 export class CommentsController {
-  constructor(private readonly commentsService: CommentsService) {}
+  constructor(private readonly commentsService: CommentsService) { }
 
-  @Post()
+  @Post('/')
+  @Authorization()
   create(
+    @Authorized('id')
+    id: string,
     @Body()
     createCommentDto: CreateCommentDto,
   ) {
-    return this.commentsService.addComment(createCommentDto);
+    return this.commentsService.addComment(id, createCommentDto);
   }
 
   @Get(':id')

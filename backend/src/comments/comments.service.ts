@@ -16,14 +16,14 @@ export class CommentsService {
     private postsRepository: Repository<Post>,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-  ) {}
+  ) { }
 
-  async addComment(createCommentDto: CreateCommentDto): Promise<PostComment> {
+  async addComment(id: string, createCommentDto: CreateCommentDto): Promise<PostComment> {
     const post = await this.postsRepository.findOne({
       where: { id: createCommentDto.postId },
     });
     const user = await this.usersRepository.findOne({
-      where: { id: createCommentDto.userId },
+      where: { id },
     });
 
     if (!post || !user) {
