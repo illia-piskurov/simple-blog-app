@@ -1,0 +1,63 @@
+name: CI for frontend and backend
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  install-and-test:
+    name: Install dependencies and run tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 22
+
+    # ---------- FRONTEND ----------
+    - name: Install dependencies (frontend)
+      working-directory: frontend
+      run: npm ci
+
+    # - name: Run frontend tests
+    #   working-directory: frontend
+    #   env:
+    #     APP_ENV: development
+    #     APP_URL: http://localhost:3001
+    #     APP_DOMAIN: localhost
+    #     SERVER_URL: http://localhost:3000
+    #   run: npm run test
+
+    - name: Run frontend lint
+      working-directory: frontend
+      run: npm run lint
+
+    # ---------- BACKEND ----------
+    - name: Install dependencies (backend)
+      working-directory: backend
+      run: npm ci
+
+    # - name: Run database migrations (TypeORM)
+    #   working-directory: backend
+    #   run: npm run typeorm migration:run
+
+    - name: Run backend tests
+      working-directory: backend
+      env:
+        NODE_ENV: development
+        ALLOWRD_ORIGINS: http://localhost:3001
+        COOKIE_DOMAIN: localhost
+        JWT_SECRET: <secret here>
+        JWT_ACCESS_TOKEN_TTL: 2h
+        JWT_REFRESH_TOKEN_TTL: 7d
+        SQLITE_DATABASE: posts.db
+      run: npm run test
+
+    - name: Run backend lint
+      working-directory: backend
+      run: npm run lint
