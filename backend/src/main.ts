@@ -16,7 +16,7 @@ async function bootstrap() {
 
   app.enableCors({
     origin: config.getOrThrow<string>('ALLOWRD_ORIGINS'),
-    methods: '*',
+    methods: 'GET,PUT,PATCH,DELETE,POST',
     credentials: true,
   });
   setupSwagger(app);

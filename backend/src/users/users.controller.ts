@@ -10,10 +10,12 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Authorization } from 'src/auth/decorators/authorization.decorator';
+import { Authorized } from 'src/auth/decorators/authorized.decorator';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Post('create')
   create(@Body() createUserDto: CreateUserDto) {
@@ -30,8 +32,9 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
-  @Patch('profile/:id')
-  updateProfile(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  @Authorization()
+  @Patch('profile')
+  updateProfile(@Authorized('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.updateProfile(id, updateUserDto);
   }
 
