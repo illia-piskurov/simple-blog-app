@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import api from '@/utils/axiosInstance'
 import { useAuth } from '@/contexts/auth-context'
+import { AxiosError } from 'axios'
 
 const formSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -39,8 +40,9 @@ export default function LoginPage() {
 
       toast.success('Login successful!')
       router.push('/')
-    } catch (err: any) {
-      const message = err?.response?.data?.message ?? 'Login failed'
+    } catch (err) {
+      const error = err as AxiosError<{ message: string | string[] }>;
+      const message = error.response?.data?.message ?? 'Login failed'
       toast.error(typeof message === 'string' ? message : message.join(', '))
     }
   }

@@ -41,7 +41,7 @@ export default function ProfilePage() {
 
   const handleSubmit = async () => {
     if (!user) return
-    const token = localStorage.getItem('accessToken')
+
     try {
       await api.patch(`/users/profile`, user)
       toast.success('Profile updated successfully.')

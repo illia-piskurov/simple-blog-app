@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode, useEffect } from 'react'
+import { ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import api from '@/utils/axiosInstance'

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import api from '@/utils/axiosInstance'
 import { PostInfo } from "@/shared/types/post.interface";
-import { PostCard } from '@/components/PostCard'
+import { PostCard } from '@/components/post-card'
 
 export default function HomePage() {
   const [posts, setPosts] = useState<PostInfo[]>([]);

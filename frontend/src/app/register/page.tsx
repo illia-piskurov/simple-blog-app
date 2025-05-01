@@ -10,6 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import api from '@/utils/axiosInstance'
+import { AxiosError } from 'axios'
 
 
 const formSchema = z
@@ -52,8 +53,9 @@ export default function RegisterPage() {
 
       toast.success('Registration successful!')
       router.push('/')
-    } catch (err: any) {
-      const message = err?.response?.data?.message ?? 'Registration failed'
+    } catch (err) {
+      const error = err as AxiosError<{ message: string | string[] }>;
+      const message = error.response?.data?.message ?? 'Registration failed'
       toast.error(typeof message === 'string' ? message : message.join(', '))
     }
   }
