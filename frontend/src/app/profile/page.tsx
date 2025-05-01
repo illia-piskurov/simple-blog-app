@@ -1,14 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import axios from 'axios'
+import api from '@/utils/axiosInstance'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import type User from '@/shared/types/user.interface'
-import { Header } from '@/components/Header'
+import { BackArrow } from '@/components/back-arrow'
+
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null)
@@ -22,12 +23,8 @@ export default function ProfilePage() {
       return
     }
 
-    axios
-      .get<User>('http://localhost:3000/auth/@me', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+    api
+      .get<User>('http://localhost:3000/auth/@me')
       .then((res) => setUser(res.data))
       .catch(() => {
         toast.error('Failed to load profile.')
@@ -46,12 +43,7 @@ export default function ProfilePage() {
     if (!user) return
     const token = localStorage.getItem('accessToken')
     try {
-      await axios.patch(`http://localhost:3000/users/profile`, user, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        withCredentials: true,
-      })
+      await api.patch(`/users/profile`, user)
       toast.success('Profile updated successfully.')
     } catch {
       toast.error('Failed to update profile.')
@@ -63,7 +55,7 @@ export default function ProfilePage() {
 
   return (
     <div className="max-w-xl mx-auto p-6 pt-24">
-      <Header />
+      <BackArrow />
       <h2 className="text-2xl font-bold mb-6">Your Profile</h2>
 
       {[
@@ -92,9 +84,6 @@ export default function ProfilePage() {
 
       <Button onClick={handleSubmit} className="mt-4 mr-4">
         Save Changes
-      </Button>
-      <Button onClick={() => router.push('/')} className="mt-4" variant='outline'>
-        Back
       </Button>
     </div>
   )

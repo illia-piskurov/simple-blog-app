@@ -1,21 +1,10 @@
-//import { Post } from '@/types/post'
 import { MessageCircle } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
-
-// types/post.ts
-export interface Post {
-  id: string
-  title: string
-  description: string
-  author: {
-    name: string
-  }
-  commentsCount: number
-}
+import { PostInfo } from '@/shared/types/post.interface'
 
 
 interface PostCardProps {
-  post: Post
+  post: PostInfo
   onClick?: () => void
 }
 
@@ -31,7 +20,7 @@ export function PostCard({ post, onClick }: PostCardProps) {
           {post.description}
         </p>
         <div className="flex justify-between items-center text-sm text-muted-foreground">
-          <span>By {post.author.name}</span>
+          <span>By {post.user.username}</span>
           <div className="flex items-center gap-1">
             <MessageCircle className="w-4 h-4" />
             <span>{post.commentsCount}</span>

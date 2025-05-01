@@ -6,6 +6,7 @@ import {
   Column,
   ManyToOne,
   OneToMany,
+  CreateDateColumn,
 } from 'typeorm';
 
 @Entity('posts')
@@ -21,6 +22,9 @@ export class Post {
 
   @Column('text')
   body: string;
+
+  @CreateDateColumn({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
 
   @ManyToOne(() => User, (user) => user.posts)
   user: User;

@@ -1,9 +1,11 @@
 'use client'
 
-import { ReactNode, useEffect, useState } from 'react'
+import { ReactNode, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-import axios from 'axios'
+import api from '@/utils/axiosInstance'
+import { useAuth } from '@/contexts/auth-context'
+
 
 interface HeaderProps {
   children?: ReactNode
@@ -11,19 +13,12 @@ interface HeaderProps {
 
 export function Header({ children }: HeaderProps) {
   const router = useRouter()
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-
-  useEffect(() => {
-    const token = localStorage.getItem('accessToken')
-    setIsAuthenticated(!!token)
-  }, [])
+  const { isAuthenticated, logout } = useAuth()
 
   const handleLogout = () => {
-    axios.post('http://localhost:3000/auth/logout', {
-      withCredentials: true,
-    }).then(() => {
+    api.post('/auth/logout').then(() => {
       localStorage.removeItem('accessToken');
-      setIsAuthenticated(false);
+      logout();
       router.push("/");
     });
   };
@@ -42,7 +37,7 @@ export function Header({ children }: HeaderProps) {
             <Button variant="outline" onClick={() => router.push('/profile')}>
               Profile
             </Button>
-            <Button variant="destructive" onClick={handleLogout}>
+            <Button onClick={handleLogout}>
               Log Out
             </Button>
           </>

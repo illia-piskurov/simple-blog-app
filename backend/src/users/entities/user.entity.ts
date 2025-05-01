@@ -2,6 +2,7 @@ import { Post } from 'src/posts/entities/post.entity';
 import {
   BeforeInsert,
   Column,
+  CreateDateColumn,
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -40,6 +41,9 @@ export class User {
 
   @Column({ nullable: true })
   website: string;
+
+  @CreateDateColumn({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
 
   @OneToMany(() => Post, (post) => post.user)
   posts: Post[];

@@ -9,7 +9,8 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import axios from 'axios'
+import api from '@/utils/axiosInstance'
+import { useAuth } from '@/contexts/auth-context'
 
 const formSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -17,6 +18,7 @@ const formSchema = z.object({
 })
 
 export default function LoginPage() {
+  const { login } = useAuth()
   const router = useRouter()
 
   const form = useForm({
@@ -29,13 +31,11 @@ export default function LoginPage() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const response = await axios.post('http://localhost:3000/auth/login', values, {
-        withCredentials: true,
-      })
+      const response = await api.post('/auth/login', values)
 
       const { accessToken } = response.data
 
-      localStorage.setItem('accessToken', accessToken)
+      login(accessToken)
 
       toast.success('Login successful!')
       router.push('/')
@@ -81,6 +81,16 @@ export default function LoginPage() {
               <Button type="submit" className="w-full">Login</Button>
             </form>
           </Form>
+
+          <p className="text-center mt-4">
+            Don’t have an account?{' '}
+            <button
+              onClick={() => router.push('/register')}
+              className="text-blue-600 font-semibold hover:underline"
+            >
+              Sign up
+            </button>
+          </p>
         </CardContent>
       </Card>
     </div>

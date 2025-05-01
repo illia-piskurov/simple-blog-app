@@ -13,7 +13,7 @@ export class PostsService {
     private postsRepository: Repository<Post>,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-  ) {}
+  ) { }
 
   async create(createPostDto: CreatePostDto): Promise<Post> {
     const user = await this.usersRepository.findOne({
@@ -35,12 +35,24 @@ export class PostsService {
   }
 
   async findAll(): Promise<Post[]> {
-    return this.postsRepository.find();
+    const posts = await this.postsRepository
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.user', 'author')
+      .loadRelationCountAndMap('post.commentsCount', 'post.comments')
+      .getMany();
+
+    return posts;
   }
 
   async findOne(id: string): Promise<Post | null> {
-    return this.postsRepository.findOne({
+    return await this.postsRepository.findOne({
       where: { id },
+      relations: {
+        user: true,
+        comments: {
+          user: true,
+        },
+      }
     });
   }
 

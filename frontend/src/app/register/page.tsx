@@ -9,7 +9,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import axios from 'axios'
+import api from '@/utils/axiosInstance'
 
 
 const formSchema = z
@@ -45,9 +45,7 @@ export default function RegisterPage() {
     }
 
     try {
-      const response = await axios.post('http://localhost:3000/auth/register', payload, {
-        withCredentials: true,
-      })
+      const response = await api.post('/auth/register', payload)
 
       const { accessToken } = response.data;
       localStorage.setItem('accessToken', accessToken);
