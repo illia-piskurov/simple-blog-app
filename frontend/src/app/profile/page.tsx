@@ -9,16 +9,17 @@ import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import type User from '@/shared/types/user.interface'
 import { BackArrow } from '@/components/back-arrow'
+import { useAuth } from '@/contexts/auth-context'
 
 
 export default function ProfilePage() {
+  const { isAuthenticated } = useAuth()
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
 
   useEffect(() => {
-    const token = localStorage.getItem('accessToken')
-    if (!token) {
+    if (!isAuthenticated) {
       router.push('/login')
       return
     }
@@ -41,7 +42,7 @@ export default function ProfilePage() {
 
   const handleSubmit = async () => {
     if (!user) return
-    const token = localStorage.getItem('accessToken')
+
     try {
       await api.patch(`/users/profile`, user)
       toast.success('Profile updated successfully.')

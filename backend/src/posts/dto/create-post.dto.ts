@@ -16,9 +16,4 @@ export class CreatePostDto {
   @IsString()
   @IsNotEmpty()
   body: string;
-
-  @ApiProperty({ description: 'ID of the user who created the post' })
-  @IsNumber()
-  @IsNotEmpty()
-  userId: string;
 }

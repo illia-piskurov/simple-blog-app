@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import api from '@/utils/axiosInstance'
 import { PostInfo } from "@/shared/types/post.interface";
-import { PostCard } from '@/components/PostCard'
+import { PostCard } from '@/components/post-card'
 
 export default function HomePage() {
   const [posts, setPosts] = useState<PostInfo[]>([]);
@@ -30,7 +30,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col gradient-bg">
+    <div className="min-h-screen flex flex-col">
       <main className="flex-1 p-6 pt-24">
         <h2 className="text-2xl font-semibold mb-4">Recent Posts</h2>
 
