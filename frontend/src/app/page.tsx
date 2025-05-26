@@ -30,7 +30,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col gradient-bg">
+    <div className="min-h-screen flex flex-col">
       <main className="flex-1 p-6 pt-24">
         <h2 className="text-2xl font-semibold mb-4">Recent Posts</h2>
 
