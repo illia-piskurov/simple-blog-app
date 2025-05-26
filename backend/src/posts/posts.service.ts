@@ -15,14 +15,14 @@ export class PostsService {
     private usersRepository: Repository<User>,
   ) { }
 
-  async create(createPostDto: CreatePostDto): Promise<Post> {
+  async create(id: string, createPostDto: CreatePostDto): Promise<Post> {
     const user = await this.usersRepository.findOne({
-      where: { id: createPostDto.userId },
+      where: { id },
     });
 
     if (!user) {
       throw new NotFoundException(
-        `User with id "${createPostDto.userId}" not found.`,
+        `User with id "${id}" not found.`,
       );
     }
 
